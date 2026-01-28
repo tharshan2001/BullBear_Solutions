@@ -9,35 +9,44 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
 @RestController
-@RequestMapping("/api/temp-users")
+@RequestMapping("/api/temp")
 public class TempUserController {
 
     @Autowired
     private TempUserService tempUserService;
 
     // Send OTP
-    @PostMapping("/otp")
+    @PostMapping("/send-otp")
     public ResponseEntity<?> createTempUser(@RequestBody EmailRequest request) {
         try {
             tempUserService.createTempUser(request.getEmail());
-            return ResponseEntity.ok("OTP sent successfully");
+            return ResponseEntity.ok(new ApiResponse("OTP sent successfully"));
         } catch (Exception e) {
             return ResponseEntity.status(HttpStatus.BAD_REQUEST)
-                    .body(e.getMessage());
+                    .body(new ApiResponse(e.getMessage()));
         }
     }
 
+    // Helper DTO
+    @Data
+    @AllArgsConstructor
+    static class ApiResponse {
+        private String message;
+    }
+
+
     // Verify OTP
-    @PostMapping("/otp/verify")
+    @PostMapping("/verify-otp")
     public ResponseEntity<?> verifyOtp(@RequestBody OtpRequest request) {
         try {
             tempUserService.verifyOtp(request.getEmail(), request.getOtp());
-            return ResponseEntity.ok("OTP verified successfully");
+            return ResponseEntity.ok(new ApiResponse("OTP verified successfully"));
         } catch (Exception e) {
             return ResponseEntity.status(HttpStatus.BAD_REQUEST)
-                    .body(e.getMessage());
+                    .body(new ApiResponse(e.getMessage()));
         }
     }
+
 
     // Request DTOs
     @Data

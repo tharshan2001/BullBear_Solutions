@@ -27,8 +27,11 @@ public class User {
 
     // Optional referral
     @ManyToOne
-    @JoinColumn(name = "referred_by")
+    @JoinColumn(name = "referer")
     private User referredBy;
+
+    @Column(unique = true, nullable = false)
+    private String code;
 
     @OneToMany(mappedBy = "referredBy", cascade = CascadeType.ALL)
     private List<User> references = new ArrayList<>();

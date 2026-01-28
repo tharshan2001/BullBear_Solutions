@@ -1,6 +1,7 @@
 package bullbear.app.controller;
 
 import bullbear.app.service.UserService;
+import lombok.AllArgsConstructor;
 import lombok.Data;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
@@ -25,17 +26,19 @@ public class UserController {
                     request.getPhoneNumber(),
                     request.getPassword(),
                     request.getSecurityPin(),
-                    request.getReferredBy()
+                    request.getReferredByCode()
             );
 
-            return ResponseEntity.ok("User registered successfully");
+            // ✅ Only send message
+            return ResponseEntity.ok(new ApiResponse("Registration successful"));
 
         } catch (Exception e) {
-            return ResponseEntity.badRequest().body(e.getMessage());
+            return ResponseEntity.badRequest()
+                    .body(new ApiResponse(e.getMessage()));
         }
     }
 
-    // DTO
+    // DTOs
     @Data
     public static class UserRegistrationRequest {
         private String email;
@@ -44,6 +47,12 @@ public class UserController {
         private String phoneNumber;
         private String password;
         private String securityPin;
-        private Long referredBy;
+        private String referredByCode;
+    }
+
+    @Data
+    @AllArgsConstructor
+    static class ApiResponse {
+        private String message;
     }
 }

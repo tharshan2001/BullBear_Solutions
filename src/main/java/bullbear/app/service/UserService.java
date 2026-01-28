@@ -9,7 +9,7 @@ import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.stereotype.Service;
 
 import java.time.LocalDateTime;
-import java.util.Optional;
+import java.util.Random;
 
 @Service
 public class UserService {
@@ -22,16 +22,27 @@ public class UserService {
 
     private final BCryptPasswordEncoder passwordEncoder = new BCryptPasswordEncoder();
 
+    // Generate unique referral code for user
+    private String generateUniqueCode() {
+        String code;
+        Random random = new Random();
+        do {
+            code = "BB" + (100000 + random.nextInt(900000)); // BB + 6 digits
+        } while (userRepository.findByCode(code).isPresent());
+        return code;
+    }
+
+    // Register user with referral via code
     public User registerUser(String email, String fullName, String nic,
                              String phoneNumber, String password, String securityPin,
-                             Long referredById) throws Exception {
+                             String referredByCode) throws Exception {
 
-        // Check if user already exists
+        // 1️⃣ Check if user already exists
         if (userRepository.findByEmail(email).isPresent()) {
             throw new Exception("User already exists with this email.");
         }
 
-        // Check if email is verified via TempUser
+        // 2️⃣ Check if email is verified via TempUser
         TempUser tempUser = tempUserRepository.findByEmail(email)
                 .orElseThrow(() -> new Exception("Email not verified via OTP"));
 
@@ -39,13 +50,14 @@ public class UserService {
             throw new Exception("Email not verified via OTP");
         }
 
+        // 3️⃣ Handle referral via code
         User referringUser = null;
-        if (referredById != null) {
-            referringUser = userRepository.findById(referredById)
-                    .orElseThrow(() -> new Exception("Invalid referral ID"));
+        if (referredByCode != null && !referredByCode.isEmpty()) {
+            referringUser = userRepository.findByCode(referredByCode)
+                    .orElseThrow(() -> new Exception("Invalid referral code"));
         }
 
-        // Create new user
+        // 4️⃣ Create new user
         User user = new User();
         user.setEmail(email);
         user.setFullName(fullName);
@@ -54,22 +66,26 @@ public class UserService {
         user.setPasswordHash(passwordEncoder.encode(password));
         user.setSecurityPin(passwordEncoder.encode(securityPin));
 
-        // Handle referral
+        // Generate unique referral code
+        user.setCode(generateUniqueCode());
+
+        // Set referral relationship
         if (referringUser != null) {
             user.setReferredBy(referringUser);
-            referringUser.getReferences().add(user);
-            userRepository.save(referringUser); // save referring user with new reference
+            referringUser.getReferences().add(user); // add this user to referrer's references
+            userRepository.save(referringUser);      // save referring user
         }
 
-        // Activate Premium for 1 year
+        // 5️⃣ Activate Premium for 1 year
         LocalDateTime now = LocalDateTime.now();
         user.setPremiumActive(true);
         user.setPremiumActivatedDate(now);
         user.setPremiumExpiryDate(now.plusYears(1));
 
+        // 6️⃣ Save new user
         User savedUser = userRepository.save(user);
 
-        // Delete temp user record
+        // 7️⃣ Delete temp user
         tempUserRepository.delete(tempUser);
 
         return savedUser;
