@@ -1,12 +1,14 @@
 package bullbear.app.controller;
 
+import bullbear.app.dto.auth.ApiResponse;
+import bullbear.app.dto.auth.EmailRequest;
+import bullbear.app.dto.auth.OtpRequest;
 import bullbear.app.service.TempUserService;
-import lombok.AllArgsConstructor;
-import lombok.Data;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
+
 
 @RestController
 @RequestMapping("/api/temp")
@@ -27,13 +29,6 @@ public class TempUserController {
         }
     }
 
-    // Helper DTO
-    @Data
-    @AllArgsConstructor
-    static class ApiResponse {
-        private String message;
-    }
-
 
     // Verify OTP
     @PostMapping("/verify-otp")
@@ -48,15 +43,4 @@ public class TempUserController {
     }
 
 
-    // Request DTOs
-    @Data
-    static class EmailRequest {
-        private String email;
-    }
-
-    @Data
-    static class OtpRequest {
-        private String email;
-        private String otp;
-    }
 }

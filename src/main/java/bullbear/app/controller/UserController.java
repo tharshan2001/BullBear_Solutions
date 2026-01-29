@@ -1,5 +1,7 @@
 package bullbear.app.controller;
 
+import bullbear.app.dto.auth.ApiResponse;
+import bullbear.app.dto.auth.RegisterRequest;
 import bullbear.app.service.UserService;
 import lombok.AllArgsConstructor;
 import lombok.Data;
@@ -17,7 +19,7 @@ public class UserController {
     }
 
     @PostMapping("/register")
-    public ResponseEntity<?> registerUser(@RequestBody UserRegistrationRequest request) {
+    public ResponseEntity<?> registerUser(@RequestBody RegisterRequest request) {
         try {
             userService.registerUser(
                     request.getEmail(),
@@ -29,7 +31,7 @@ public class UserController {
                     request.getReferredByCode()
             );
 
-            // ✅ Only send message
+            // Only send message
             return ResponseEntity.ok(new ApiResponse("Registration successful"));
 
         } catch (Exception e) {
@@ -38,21 +40,4 @@ public class UserController {
         }
     }
 
-    // DTOs
-    @Data
-    public static class UserRegistrationRequest {
-        private String email;
-        private String fullName;
-        private String nic;
-        private String phoneNumber;
-        private String password;
-        private String securityPin;
-        private String referredByCode;
-    }
-
-    @Data
-    @AllArgsConstructor
-    static class ApiResponse {
-        private String message;
-    }
 }

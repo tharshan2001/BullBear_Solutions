@@ -1,4 +1,4 @@
-package bullbear.app.dto;
+package bullbear.app.dto.auth;
 
 import lombok.Data;
 
