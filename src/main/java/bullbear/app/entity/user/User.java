@@ -61,6 +61,10 @@ public class User implements UserDetails {
         return List.of(new SimpleGrantedAuthority(role));
     }
 
+    public Integer getUserId() {
+        return id != null ? id.intValue() : null;
+    }
+
     @Override
     public String getPassword() {
         return passwordHash;

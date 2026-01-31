@@ -2,9 +2,9 @@ package bullbear.app.controller;
 
 import bullbear.app.dto.auth.ApiResponse;
 import bullbear.app.dto.auth.RegisterRequest;
+import bullbear.app.entity.user.User;
 import bullbear.app.service.UserService;
-import lombok.AllArgsConstructor;
-import lombok.Data;
+import bullbear.app.utils.NotificationUtil;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
@@ -13,15 +13,18 @@ import org.springframework.web.bind.annotation.*;
 public class UserController {
 
     private final UserService userService;
+    private final NotificationUtil notificationUtil;
 
-    public UserController(UserService userService) {
+    public UserController(UserService userService, NotificationUtil notificationUtil) {
         this.userService = userService;
+        this.notificationUtil = notificationUtil;
     }
 
     @PostMapping("/register")
     public ResponseEntity<?> registerUser(@RequestBody RegisterRequest request) {
         try {
-            userService.registerUser(
+            // Register user and get the User object
+            User newUser = userService.registerUser(
                     request.getEmail(),
                     request.getFullName(),
                     request.getNic(),
@@ -31,7 +34,14 @@ public class UserController {
                     request.getReferredByCode()
             );
 
-            // Only send message
+            // Send notification after successful registration
+            notificationUtil.notifyUser(
+                    newUser.getUserId(),
+                    "SYSTEM",
+                    "Welcome " + newUser.getFullName() + "! Your registration was successful."
+            );
+
+            // Return response
             return ResponseEntity.ok(new ApiResponse("Registration successful"));
 
         } catch (Exception e) {
@@ -39,5 +49,4 @@ public class UserController {
                     .body(new ApiResponse(e.getMessage()));
         }
     }
-
 }
