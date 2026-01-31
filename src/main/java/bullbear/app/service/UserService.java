@@ -32,7 +32,9 @@ public class UserService {
         return code;
     }
 
-    // Register user with referral via code
+    // =========================
+    // Register User
+    // =========================
     public User registerUser(String email, String fullName, String nic,
                              String phoneNumber, String password, String securityPin,
                              String referredByCode) throws Exception {
@@ -89,5 +91,22 @@ public class UserService {
         tempUserRepository.delete(tempUser);
 
         return savedUser;
+    }
+
+    // =========================
+    // Login User
+    // =========================
+    public User login(String email, String password) throws Exception {
+        // 1️⃣ Find user by email
+        User user = userRepository.findByEmail(email)
+                .orElseThrow(() -> new Exception("Invalid email or password"));
+
+        // 2️⃣ Verify password
+        if (!passwordEncoder.matches(password, user.getPasswordHash())) {
+            throw new Exception("Invalid email or password");
+        }
+
+        // 3️⃣ Return user object on successful login
+        return user;
     }
 }

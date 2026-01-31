@@ -1,6 +1,7 @@
 package bullbear.app.controller;
 
 import bullbear.app.dto.auth.ApiResponse;
+import bullbear.app.dto.auth.LoginRequest;
 import bullbear.app.dto.auth.RegisterRequest;
 import bullbear.app.entity.user.User;
 import bullbear.app.service.UserService;
@@ -20,6 +21,9 @@ public class UserController {
         this.notificationUtil = notificationUtil;
     }
 
+    // ============================
+    // Register User
+    // ============================
     @PostMapping("/register")
     public ResponseEntity<?> registerUser(@RequestBody RegisterRequest request) {
         try {
@@ -43,6 +47,24 @@ public class UserController {
 
             // Return response
             return ResponseEntity.ok(new ApiResponse("Registration successful"));
+
+        } catch (Exception e) {
+            return ResponseEntity.badRequest()
+                    .body(new ApiResponse(e.getMessage()));
+        }
+    }
+
+    // ============================
+    // Login User
+    // ============================
+    @PostMapping("/login")
+    public ResponseEntity<?> loginUser(@RequestBody LoginRequest request) {
+        try {
+            // Call service to authenticate user
+            User user = userService.login(request.getEmail(), request.getPassword());
+
+            // Return success response (you can return JWT if implemented)
+            return ResponseEntity.ok(new ApiResponse("Login successful"));
 
         } catch (Exception e) {
             return ResponseEntity.badRequest()
