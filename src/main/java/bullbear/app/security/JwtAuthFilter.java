@@ -2,6 +2,7 @@ package bullbear.app.security;
 
 import bullbear.app.entity.user.User;
 import bullbear.app.repository.UserRepository;
+import io.jsonwebtoken.JwtException;
 import jakarta.servlet.FilterChain;
 import jakarta.servlet.ServletException;
 import jakarta.servlet.http.HttpServletRequest;
@@ -37,24 +38,24 @@ public class JwtAuthFilter extends OncePerRequestFilter {
             token = authHeader.substring(7);
             try {
                 email = jwtUtil.extractUsername(token);
-            } catch (Exception e) {
-                // Invalid token
+            } catch (JwtException e) {
+                // Invalid token, just ignore
             }
         }
 
         if (email != null && SecurityContextHolder.getContext().getAuthentication() == null) {
             User user = userRepository.findByEmail(email).orElse(null);
-
             if (user != null && jwtUtil.validateToken(token, email)) {
                 UsernamePasswordAuthenticationToken authToken =
                         new UsernamePasswordAuthenticationToken(
-                                user, // store User entity
+                                user,
                                 null,
                                 user.getAuthorities()
                         );
                 SecurityContextHolder.getContext().setAuthentication(authToken);
             }
         }
+
 
         filterChain.doFilter(request, response);
     }

@@ -2,10 +2,10 @@ package bullbear.app.entity.user;
 
 import jakarta.persistence.*;
 import lombok.Data;
-import lombok.Getter;
-import lombok.Setter;
+import lombok.NoArgsConstructor;
 import org.jspecify.annotations.NullMarked;
 import org.springframework.security.core.GrantedAuthority;
+import org.springframework.security.core.authority.SimpleGrantedAuthority;
 import org.springframework.security.core.userdetails.UserDetails;
 
 import java.time.LocalDateTime;
@@ -16,6 +16,7 @@ import java.util.List;
 @Entity
 @Table(name = "users")
 @Data
+@NoArgsConstructor
 @NullMarked
 public class User implements UserDetails {
 
@@ -49,22 +50,25 @@ public class User implements UserDetails {
     @Column(unique = true, nullable = false)
     private String code;
 
+    // Example role field for future expansion
+    private String role = "ROLE_USER"; // default role
+
     // =============================
     // UserDetails implementation
     // =============================
     @Override
     public Collection<? extends GrantedAuthority> getAuthorities() {
-        return List.of(); // Add roles later if needed
+        return List.of(new SimpleGrantedAuthority(role));
     }
 
     @Override
     public String getPassword() {
-        return passwordHash; // for Spring Security
+        return passwordHash;
     }
 
     @Override
     public String getUsername() {
-        return email; // login via email
+        return email;
     }
 
     @Override
