@@ -9,15 +9,18 @@ import java.util.List;
 @Configuration
 public class WebConfig implements WebMvcConfigurer {
 
-    private final CurrentUserArgumentResolver resolver;
+    private final CurrentUserArgumentResolver userResolver;
+    private final CurrentAdminArgumentResolver adminResolver;
 
-    public WebConfig(CurrentUserArgumentResolver resolver) {
-        this.resolver = resolver;
+    public WebConfig(CurrentUserArgumentResolver userResolver,
+                     CurrentAdminArgumentResolver adminResolver) {
+        this.userResolver = userResolver;
+        this.adminResolver = adminResolver;
     }
 
     @Override
     public void addArgumentResolvers(List<HandlerMethodArgumentResolver> resolvers) {
-        resolvers.add(resolver);
+        resolvers.add(userResolver);   // @CurrentUser
+        resolvers.add(adminResolver);  // @CurrentAdmin
     }
 }
-

@@ -7,6 +7,8 @@ import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.stereotype.Service;
 import bullbear.app.security.AdminJwtAuthFilter;
 
+import java.util.Optional;
+
 @Service
 public class AdminService {
 
@@ -22,16 +24,20 @@ public class AdminService {
     // ============================
     // Authenticate Admin
     // ============================
-    public String login(String email, String password) throws Exception {
+    public Admin login(String email, String password) throws Exception {
+        Optional<Admin> optionalAdmin = adminRepository.findByEmail(email);
 
-        Admin admin = adminRepository.findByEmail(email)
-                .orElseThrow(() -> new Exception("Admin not found"));
+        if (optionalAdmin.isEmpty()) {
+            throw new Exception("Admin not found");
+        }
+
+        Admin admin = optionalAdmin.get();
 
         if (!passwordEncoder.matches(password, admin.getPasswordHash())) {
             throw new Exception("Invalid credentials");
         }
 
-        return adminJwtUtil.generateToken(admin.getEmail());
+        return admin; // ✅ return the Admin entity
     }
 
     // ============================
