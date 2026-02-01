@@ -1,6 +1,7 @@
 package bullbear.app.security;
 
 import bullbear.app.entity.user.User;
+import org.jspecify.annotations.NullMarked;
 import org.springframework.core.MethodParameter;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.context.SecurityContextHolder;
@@ -30,7 +31,8 @@ public class CurrentUserArgumentResolver implements HandlerMethodArgumentResolve
 
         if (auth == null || !auth.isAuthenticated()) return null;
 
-        Object principal = auth.getPrincipal();
-        return principal instanceof User user ? user : null;
+        if ("anonymousUser".equals(auth.getPrincipal())) return null;
+
+        return auth.getPrincipal() instanceof User user ? user : null;
     }
 }

@@ -30,13 +30,14 @@ public class SecurityConfig {
                 .sessionManagement(session ->
                         session.sessionCreationPolicy(SessionCreationPolicy.STATELESS)
                 )
-                .authorizeHttpRequests(auth ->
-                        auth.anyRequest().permitAll() // allow all endpoints temporarily
+                .authorizeHttpRequests(auth -> auth
+                        .requestMatchers("/api/auth/**").permitAll()
+                        .requestMatchers("/api/notifications/**").authenticated()
+                        .anyRequest().permitAll()
                 )
                 .httpBasic(basic -> basic.disable())
                 .formLogin(form -> form.disable());
 
-        // You can keep the JWT filter, but it won't block requests now
         http.addFilterBefore(jwtAuthFilter, UsernamePasswordAuthenticationFilter.class);
 
         return http.build();

@@ -23,6 +23,12 @@ public class NotificationController {
      */
     @GetMapping
     public List<Notification> getUserNotifications(@CurrentUser User currentUser) {
-        return notificationUtil.getUserNotifications(currentUser.getId().intValue());
+        if (currentUser == null) {
+            throw new RuntimeException("User not authenticated");
+        }
+
+        return notificationUtil.getUserNotifications(
+                currentUser.getId().intValue()
+        );
     }
 }
