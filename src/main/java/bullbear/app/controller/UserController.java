@@ -7,6 +7,7 @@ import bullbear.app.entity.user.User;
 import bullbear.app.security.JwtUtil;
 import bullbear.app.service.UserService;
 import bullbear.app.utils.NotificationUtil;
+import bullbear.app.utils.WalletUtil;
 import jakarta.servlet.http.HttpServletResponse;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
@@ -17,15 +18,18 @@ public class UserController {
 
     private final UserService userService;
     private final NotificationUtil notificationUtil;
+    private final WalletUtil walletUtil;
     private final JwtUtil jwtUtil;
 
     public UserController(
             UserService userService,
             NotificationUtil notificationUtil,
+            WalletUtil walletUtil,
             JwtUtil jwtUtil
     ) {
         this.userService = userService;
         this.notificationUtil = notificationUtil;
+        this.walletUtil = walletUtil;
         this.jwtUtil = jwtUtil;
     }
 
@@ -45,6 +49,10 @@ public class UserController {
                     request.getReferredByCode()
             );
 
+            // ✅ Create default wallets (CW, USDT, etc.)
+            walletUtil.createDefaultWallets(newUser);
+
+            // 🔔 Welcome notification
             notificationUtil.notifyUser(
                     newUser.getUserId(),
                     "SYSTEM",
@@ -71,7 +79,6 @@ public class UserController {
 
             String token = jwtUtil.generateToken(user.getEmail());
 
-            // 🔐 HttpOnly JWT cookie
             response.addHeader("Set-Cookie",
                     "token=" + token +
                             "; HttpOnly; Path=/; Max-Age=86400; SameSite=Lax"
