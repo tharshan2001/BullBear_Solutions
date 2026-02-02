@@ -23,7 +23,7 @@ public class NotificationUtil {
      * @param type    type of notification (e.g., TRANSACTION, SYSTEM)
      * @param message message content
      */
-    public void notifyUser(Integer userId, String type, String message) {
+    public void notifyUser(Long userId, String type, String message) {
         Notification notification = new Notification();
         notification.setUserId(userId);
         notification.setType(type);

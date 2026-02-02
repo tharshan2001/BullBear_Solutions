@@ -9,6 +9,7 @@ import bullbear.app.service.UserService;
 import bullbear.app.utils.NotificationUtil;
 import bullbear.app.utils.WalletUtil;
 import jakarta.servlet.http.HttpServletResponse;
+import jakarta.validation.Valid;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
@@ -37,7 +38,7 @@ public class UserController {
     // Register User
     // ============================
     @PostMapping("/register")
-    public ResponseEntity<?> registerUser(@RequestBody RegisterRequest request) {
+    public ResponseEntity<?> registerUser(@Valid @RequestBody RegisterRequest request) {
         try {
             User newUser = userService.registerUser(
                     request.getEmail(),
@@ -54,14 +55,14 @@ public class UserController {
 
             // 🔔 Welcome notification
             notificationUtil.notifyUser(
-                    newUser.getUserId(),
+                    newUser.getUserId(), // Long-safe
                     "SYSTEM",
                     "Welcome " + newUser.getFullName() + "!"
             );
 
             return ResponseEntity.ok(new ApiResponse("Registration successful"));
 
-        } catch (Exception e) {
+        } catch (RuntimeException e) {
             return ResponseEntity.badRequest().body(new ApiResponse(e.getMessage()));
         }
     }
@@ -71,7 +72,7 @@ public class UserController {
     // ============================
     @PostMapping("/login")
     public ResponseEntity<?> loginUser(
-            @RequestBody LoginRequest request,
+            @Valid @RequestBody LoginRequest request,
             HttpServletResponse response
     ) {
         try {
@@ -86,7 +87,7 @@ public class UserController {
 
             return ResponseEntity.ok(new ApiResponse("Login successful"));
 
-        } catch (Exception e) {
+        } catch (RuntimeException e) {
             return ResponseEntity.badRequest().body(new ApiResponse(e.getMessage()));
         }
     }

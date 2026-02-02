@@ -7,7 +7,6 @@ import bullbear.app.repository.WalletRepository;
 import bullbear.app.repository.WalletTypeRepository;
 import org.springframework.stereotype.Service;
 
-import java.math.BigDecimal;
 import java.util.List;
 
 @Service
@@ -38,8 +37,8 @@ public class WalletService {
         Wallet wallet = Wallet.builder()
                 .user(user)
                 .walletType(walletType)
-                .balance(BigDecimal.ZERO)
-                .lockedBalance(BigDecimal.ZERO)
+                .balance(0.0)
+                .lockedBalance(0.0)
                 .build();
 
         return walletRepository.save(wallet);
@@ -55,34 +54,34 @@ public class WalletService {
     // ============================
     // Balance Operations
     // ============================
-    public void credit(Wallet wallet, BigDecimal amount) {
-        wallet.setBalance(wallet.getBalance().add(amount));
+    public void credit(Wallet wallet, double amount) {
+        wallet.setBalance(wallet.getBalance() + amount);
         walletRepository.save(wallet);
     }
 
-    public void debit(Wallet wallet, BigDecimal amount) {
-        if (wallet.getBalance().compareTo(amount) < 0) {
+    public void debit(Wallet wallet, double amount) {
+        if (wallet.getBalance() < amount) {
             throw new RuntimeException("Insufficient balance");
         }
-        wallet.setBalance(wallet.getBalance().subtract(amount));
+        wallet.setBalance(wallet.getBalance() - amount);
         walletRepository.save(wallet);
     }
 
-    public void lockAmount(Wallet wallet, BigDecimal amount) {
-        if (wallet.getBalance().compareTo(amount) < 0) {
+    public void lockAmount(Wallet wallet, double amount) {
+        if (wallet.getBalance() < amount) {
             throw new RuntimeException("Insufficient balance to lock");
         }
-        wallet.setBalance(wallet.getBalance().subtract(amount));
-        wallet.setLockedBalance(wallet.getLockedBalance().add(amount));
+        wallet.setBalance(wallet.getBalance() - amount);
+        wallet.setLockedBalance(wallet.getLockedBalance() + amount);
         walletRepository.save(wallet);
     }
 
-    public void unlockAmount(Wallet wallet, BigDecimal amount) {
-        if (wallet.getLockedBalance().compareTo(amount) < 0) {
+    public void unlockAmount(Wallet wallet, double amount) {
+        if (wallet.getLockedBalance() < amount) {
             throw new RuntimeException("Insufficient locked balance");
         }
-        wallet.setLockedBalance(wallet.getLockedBalance().subtract(amount));
-        wallet.setBalance(wallet.getBalance().add(amount));
+        wallet.setLockedBalance(wallet.getLockedBalance() - amount);
+        wallet.setBalance(wallet.getBalance() + amount);
         walletRepository.save(wallet);
     }
 }

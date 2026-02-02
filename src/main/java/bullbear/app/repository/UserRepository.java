@@ -1,6 +1,7 @@
 package bullbear.app.repository;
 
 import bullbear.app.entity.user.User;
+import bullbear.app.entity.wallet.Wallet;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.stereotype.Repository;
 
@@ -16,5 +17,8 @@ public interface UserRepository extends JpaRepository<User, Long> {
     boolean existsByEmail(String email);
 
     Optional<User> findByCode(String code);
+
+    Optional<Wallet> findByUserIdAndWalletTypeId(int userId, int walletTypeId);
+
 
 }

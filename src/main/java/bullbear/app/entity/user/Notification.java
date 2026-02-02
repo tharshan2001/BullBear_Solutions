@@ -12,9 +12,9 @@ public class Notification {
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
-    private Integer notificationId;
+    private Long notificationId;
 
-    private Integer userId;
+    private Long userId;
 
     private String type; // e.g., TRANSACTION, SYSTEM, COMMISSION
 

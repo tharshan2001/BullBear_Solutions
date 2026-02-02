@@ -16,7 +16,7 @@ public class WalletType {
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
-    private Integer walletTypeId;
+    private Long walletTypeId;
 
     @Column(unique = true, nullable = false, length = 20)
     private String name; // e.g. CW, USDT

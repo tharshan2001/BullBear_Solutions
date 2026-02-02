@@ -1,8 +1,7 @@
 package bullbear.app.entity.user;
 
 import jakarta.persistence.*;
-import lombok.Data;
-import lombok.NoArgsConstructor;
+import lombok.*;
 import org.jspecify.annotations.NullMarked;
 import org.springframework.security.core.GrantedAuthority;
 import org.springframework.security.core.authority.SimpleGrantedAuthority;
@@ -15,14 +14,17 @@ import java.util.List;
 
 @Entity
 @Table(name = "users")
-@Data
+@Getter
+@Setter
 @NoArgsConstructor
+@AllArgsConstructor
+@Builder
 @NullMarked
 public class User implements UserDetails {
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
-    private Long id;
+    private Long id; // fully Long
 
     @Column(unique = true, nullable = false)
     private String email;
@@ -36,11 +38,11 @@ public class User implements UserDetails {
 
     private String securityPin;
 
-    @ManyToOne
+    @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "referer")
     private User referredBy;
 
-    @OneToMany(mappedBy = "referredBy", cascade = CascadeType.ALL)
+    @OneToMany(mappedBy = "referredBy", cascade = CascadeType.ALL, orphanRemoval = true)
     private List<User> references = new ArrayList<>();
 
     private boolean premiumActive;
@@ -50,19 +52,21 @@ public class User implements UserDetails {
     @Column(unique = true, nullable = false)
     private String code;
 
-    // Example role field for future expansion
-    private String role = "ROLE_USER"; // default role
+    private String role = "ROLE_USER";
 
     // =============================
-    // UserDetails implementation
+    // Custom getter for ID
+    // =============================
+    public Long getUserId() {
+        return id;
+    }
+
+    // =============================
+    // UserDetails Implementation
     // =============================
     @Override
     public Collection<? extends GrantedAuthority> getAuthorities() {
         return List.of(new SimpleGrantedAuthority(role));
-    }
-
-    public Integer getUserId() {
-        return id != null ? id.intValue() : null;
     }
 
     @Override
