@@ -49,7 +49,7 @@ public class UserController {
                     request.getReferredByCode()
             );
 
-            // ✅ Create default wallets (CW, USDT, etc.)
+            //  Create default wallets (CW, USDT, etc.)
             walletUtil.createDefaultWallets(newUser);
 
             // 🔔 Welcome notification
