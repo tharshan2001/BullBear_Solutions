@@ -18,7 +18,6 @@ public interface UserRepository extends JpaRepository<User, Long> {
 
     Optional<User> findByCode(String code);
 
-    Optional<Wallet> findByUserIdAndWalletTypeId(int userId, int walletTypeId);
 
 
 }

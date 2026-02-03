@@ -7,5 +7,5 @@ import java.util.List;
 
 public interface WalletAuditLogRepository extends JpaRepository<WalletAuditLog, Integer> {
 
-    List<WalletAuditLog> findByWallet_WalletId(Integer walletId);
+    List<WalletAuditLog> findByWallet_Id(Long walletId);
 }

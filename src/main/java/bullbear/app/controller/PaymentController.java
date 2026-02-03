@@ -22,13 +22,13 @@ public class PaymentController {
 
     @PostMapping("/create")
     public ResponseEntity<?> createPayment(@RequestParam String email,
-                                           @RequestParam double amount,  // changed from BigDecimal
+                                           @RequestParam double amount,
                                            @RequestParam String network) {
         try {
             User user = userService.findByEmail(email)
                     .orElseThrow(() -> new RuntimeException("User not found"));
 
-            Map<String, Object> invoice = paymentService.createInvoice(user, amount, network); // update PaymentService to accept double
+            Map<String, Object> invoice = paymentService.createInvoice(user, amount, network);
 
             return ResponseEntity.ok(invoice);
         } catch (Exception e) {
