@@ -1,4 +1,4 @@
-package bullbear.app.repository;
+package bullbear.app.repository.wallet;
 
 import bullbear.app.entity.user.User;
 import bullbear.app.entity.wallet.Wallet;
@@ -20,5 +20,6 @@ public interface WalletRepository extends JpaRepository<Wallet, Long> {
 
     // Shortcut using IDs
     Optional<Wallet> findByUser_IdAndWalletType_WalletTypeId(Long userId, Long walletTypeId);
+
 
 }

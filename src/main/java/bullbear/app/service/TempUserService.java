@@ -1,7 +1,7 @@
 package bullbear.app.service;
 
 import bullbear.app.entity.user.TempUser;
-import bullbear.app.repository.TempUserRepository;
+import bullbear.app.repository.user.TempUserRepository;
 import bullbear.app.utils.EmailSender;
 import jakarta.mail.MessagingException;
 import org.springframework.beans.factory.annotation.Autowired;

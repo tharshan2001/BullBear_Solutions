@@ -1,4 +1,4 @@
-package bullbear.app.repository;
+package bullbear.app.repository.wallet;
 
 import bullbear.app.entity.wallet.WalletType;
 import org.springframework.data.jpa.repository.JpaRepository;

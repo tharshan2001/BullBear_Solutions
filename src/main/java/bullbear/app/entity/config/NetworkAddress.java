@@ -6,19 +6,20 @@ import lombok.*;
 import java.time.LocalDateTime;
 
 @Entity
+@Table(name = "network_addresses")
 @Data
 @NoArgsConstructor
 @AllArgsConstructor
-@Table(name = "network_addresses")
+@Builder
 public class NetworkAddress {
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
-    private Integer addressId;
+    private Long addressId;
 
-    private String network; // e.g., TRC20, BEP20
-    private String address;
+    private String network; // TRC20 / BEP20
+    private String address; // Your wallet address
     private String label;
-    private Boolean active = true;
+    private Boolean active;
     private LocalDateTime createdAt;
 }

@@ -1,7 +1,7 @@
 package bullbear.app.security;
 
 import bullbear.app.entity.user.Admin;
-import bullbear.app.repository.AdminRepository;
+import bullbear.app.repository.user.AdminRepository;
 import jakarta.servlet.http.Cookie;
 import jakarta.servlet.http.HttpServletRequest;
 import org.springframework.core.MethodParameter;

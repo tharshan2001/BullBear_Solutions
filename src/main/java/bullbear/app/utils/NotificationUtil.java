@@ -1,7 +1,7 @@
 package bullbear.app.utils;
 
 import bullbear.app.entity.user.Notification;
-import bullbear.app.repository.NotificationRepository;
+import bullbear.app.repository.user.NotificationRepository;
 import org.springframework.stereotype.Component;
 
 import java.time.LocalDateTime;

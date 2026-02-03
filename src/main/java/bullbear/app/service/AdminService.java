@@ -1,11 +1,10 @@
 package bullbear.app.service;
 
 import bullbear.app.entity.user.Admin;
-import bullbear.app.repository.AdminRepository;
+import bullbear.app.repository.user.AdminRepository;
 import bullbear.app.security.AdminJwtUtil;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.stereotype.Service;
-import bullbear.app.security.AdminJwtAuthFilter;
 
 import java.util.Optional;
 

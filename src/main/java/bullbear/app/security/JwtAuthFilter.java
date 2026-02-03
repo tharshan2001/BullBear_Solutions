@@ -1,7 +1,7 @@
 package bullbear.app.security;
 
 import bullbear.app.entity.user.User;
-import bullbear.app.repository.UserRepository;
+import bullbear.app.repository.user.UserRepository;
 import io.jsonwebtoken.JwtException;
 import jakarta.servlet.FilterChain;
 import jakarta.servlet.ServletException;

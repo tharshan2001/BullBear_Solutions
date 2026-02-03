@@ -1,11 +1,11 @@
-package bullbear.app.entity.wallet;
+package bullbear.app.entity.transaction;
+
 
 import bullbear.app.entity.user.Admin;
 import bullbear.app.entity.user.User;
+import bullbear.app.entity.wallet.Wallet;
 import jakarta.persistence.*;
 import lombok.*;
-
-import java.math.BigDecimal;
 import java.time.LocalDateTime;
 
 @Entity
@@ -18,7 +18,7 @@ public class Transaction {
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
-    private Integer transactionId;
+    private Long transactionId;
 
     @ManyToOne
     @JoinColumn(name = "user_id", nullable = false)
@@ -32,7 +32,7 @@ public class Transaction {
     private String type; // DEPOSIT, WITHDRAW, TRANSFER, COMMISSION
 
     @Column(nullable = false, precision = 19, scale = 8)
-    private BigDecimal amount;
+    private Double amount;
 
     private String currency;
     private String network;

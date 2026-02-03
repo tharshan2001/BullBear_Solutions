@@ -1,7 +1,7 @@
 package bullbear.app.config;
 
 import bullbear.app.entity.wallet.WalletType;
-import bullbear.app.repository.WalletTypeRepository;
+import bullbear.app.repository.wallet.WalletTypeRepository;
 import jakarta.annotation.PostConstruct;
 import org.springframework.stereotype.Component;
 

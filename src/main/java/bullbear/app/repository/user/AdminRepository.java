@@ -1,4 +1,4 @@
-package bullbear.app.repository;
+package bullbear.app.repository.user;
 
 import bullbear.app.entity.user.Admin;
 import org.springframework.data.jpa.repository.JpaRepository;

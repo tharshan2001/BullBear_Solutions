@@ -1,7 +1,7 @@
 package bullbear.app.service;
 
+import bullbear.app.entity.transaction.Transaction;
 import bullbear.app.entity.user.User;
-import bullbear.app.entity.wallet.Transaction;
 import bullbear.app.entity.wallet.Wallet;
 import bullbear.app.repository.TransactionRepository;
 import org.springframework.stereotype.Service;
@@ -23,7 +23,7 @@ public class TransactionService {
             User user,
             Wallet wallet,
             String type,
-            BigDecimal amount,
+            Double amount,
             String status,
             String reference
     ) {
@@ -40,7 +40,7 @@ public class TransactionService {
         return transactionRepository.save(tx);
     }
 
-    public List<Transaction> getUserTransactions(Integer userId) {
+    public List<Transaction> getUserTransactions(Long userId) {
         return transactionRepository.findByUser_Id(userId);
     }
 }

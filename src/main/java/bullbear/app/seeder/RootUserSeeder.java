@@ -2,7 +2,7 @@ package bullbear.app.seeder;
 
 
 import bullbear.app.entity.user.User;
-import bullbear.app.repository.UserRepository;
+import bullbear.app.repository.user.UserRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.CommandLineRunner;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;

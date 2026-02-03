@@ -1,7 +1,6 @@
-package bullbear.app.repository;
+package bullbear.app.repository.user;
 
 import bullbear.app.entity.user.User;
-import bullbear.app.entity.wallet.Wallet;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.stereotype.Repository;
 
