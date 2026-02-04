@@ -1,7 +1,6 @@
 package bullbear.app.security;
 
 import bullbear.app.entity.user.User;
-import org.jspecify.annotations.NullMarked;
 import org.springframework.core.MethodParameter;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.context.SecurityContextHolder;

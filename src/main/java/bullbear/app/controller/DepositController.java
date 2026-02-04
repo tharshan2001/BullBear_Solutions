@@ -12,6 +12,8 @@ import lombok.AllArgsConstructor;
 import lombok.Data;
 import org.springframework.web.bind.annotation.*;
 
+import java.math.BigDecimal;
+import java.math.RoundingMode;
 import java.time.LocalDateTime;
 
 @RestController
@@ -37,15 +39,19 @@ public class DepositController {
     public DepositResponse initDeposit(
             @RequestParam Long userId,
             @RequestParam Long walletId,
-            @RequestParam Double points,
+            @RequestParam BigDecimal points,
             @RequestParam String network
     ) {
         // Find network address
         NetworkAddress addr = addressRepo.findByNetworkAndActiveTrue(network)
                 .orElseThrow(() -> new RuntimeException("Network not supported"));
 
-        // Convert points to USDT (example)
-        double usdt = points / 100 + Math.random() / 1000;
+        // Convert points to USDT (example: 1 point = 0.01 USDT)
+        BigDecimal usdt = points.divide(BigDecimal.valueOf(100), 8, RoundingMode.HALF_UP);
+
+        // Optionally add a small random fraction for unique deposits
+        BigDecimal randomFraction = BigDecimal.valueOf(Math.random()).divide(BigDecimal.valueOf(1000), 8, RoundingMode.HALF_UP);
+        usdt = usdt.add(randomFraction);
 
         // Fetch entities
         User user = userRepository.findById(userId)
@@ -76,7 +82,7 @@ public class DepositController {
     static class DepositResponse {
         private String address;
         private String network;
-        private Double amount;
+        private BigDecimal amount;
         private Long transactionId;
     }
 }

@@ -19,7 +19,7 @@ public class WalletType {
     private Long walletTypeId;
 
     @Column(unique = true, nullable = false, length = 20)
-    private String name; // e.g. CW, USDT
+    private String name; // e.g., CW, USDT
 
     private String description;
 

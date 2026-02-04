@@ -12,6 +12,7 @@ import bullbear.app.repository.wallet.WalletTypeRepository;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import java.math.BigDecimal;
 import java.time.LocalDateTime;
 import java.util.List;
 
@@ -23,7 +24,10 @@ public class WalletService {
     private final TransactionRepository transactionRepository;
     private final WalletTypeRepository walletTypeRepository;
 
-    public WalletService(WalletRepository walletRepository, WalletAuditLogRepository auditLogRepository, TransactionRepository transactionRepository, WalletTypeRepository walletTypeRepository) {
+    public WalletService(WalletRepository walletRepository,
+                         WalletAuditLogRepository auditLogRepository,
+                         TransactionRepository transactionRepository,
+                         WalletTypeRepository walletTypeRepository) {
         this.walletRepository = walletRepository;
         this.auditLogRepository = auditLogRepository;
         this.transactionRepository = transactionRepository;
@@ -35,24 +39,30 @@ public class WalletService {
     // ===========================
     @Transactional
     public void creditDeposit(Transaction tx, String txHash) {
-        // Avoid duplicate credit
         if (transactionRepository.existsByTxHash(txHash)) return;
 
-        // Get wallet from transaction entity
         Wallet wallet = tx.getWallet();
         if (wallet == null) throw new RuntimeException("Wallet not found");
 
-        // Convert USDT to points (example rate)
-        double points = tx.getAmount() * 100;
+        BigDecimal points = tx.getAmount().multiply(BigDecimal.valueOf(100));
 
-        double before = wallet.getBalance();
-        wallet.setBalance(before + points);
+        BigDecimal before = wallet.getBalance();
+        wallet.setBalance(before.add(points));
         walletRepository.save(wallet);
 
-        // Create audit log
-        auditLogRepository.save(WalletAuditLog.builder().user(wallet.getUser()).wallet(wallet).action("DEPOSIT").amount(points).balanceBefore(before).balanceAfter(wallet.getBalance()).reference(txHash).createdAt(LocalDateTime.now()).build());
+        auditLogRepository.save(
+                WalletAuditLog.builder()
+                        .user(wallet.getUser())
+                        .wallet(wallet)
+                        .action("DEPOSIT")
+                        .amount(points)
+                        .balanceBefore(before)
+                        .balanceAfter(wallet.getBalance())
+                        .reference(txHash)
+                        .createdAt(LocalDateTime.now())
+                        .build()
+        );
 
-        // Update transaction
         tx.setTxHash(txHash);
         tx.setStatus("SUCCESS");
         transactionRepository.save(tx);
@@ -62,30 +72,55 @@ public class WalletService {
     // REQUEST WITHDRAWAL
     // ===========================
     @Transactional
-    public void requestWithdraw(Wallet wallet, double points) {
-        if (wallet.getBalance() < points) throw new RuntimeException("Insufficient balance");
+    public void requestWithdraw(Wallet wallet, BigDecimal points) {
+        if (wallet.getBalance().compareTo(points) < 0) {
+            throw new RuntimeException("Insufficient balance");
+        }
 
-        // Lock funds
-        wallet.setBalance(wallet.getBalance() - points);
-        wallet.setLockedBalance(wallet.getLockedBalance() + points);
+        BigDecimal before = wallet.getBalance();
+        wallet.setBalance(before.subtract(points));
+        wallet.setLockedBalance(wallet.getLockedBalance().add(points));
         walletRepository.save(wallet);
 
-        // Optional: Create audit log for withdrawal request
-        auditLogRepository.save(WalletAuditLog.builder().user(wallet.getUser()).wallet(wallet).action("WITHDRAW_REQUEST").amount(points).balanceBefore(wallet.getBalance() + points).balanceAfter(wallet.getBalance()).reference("REQUEST").createdAt(LocalDateTime.now()).build());
+        auditLogRepository.save(
+                WalletAuditLog.builder()
+                        .user(wallet.getUser())
+                        .wallet(wallet)
+                        .action("WITHDRAW_REQUEST")
+                        .amount(points)
+                        .balanceBefore(before)
+                        .balanceAfter(wallet.getBalance())
+                        .reference("REQUEST")
+                        .createdAt(LocalDateTime.now())
+                        .build()
+        );
     }
 
     // ===========================
-    // CONFIRM WITHDRAWAL (after blockchain tx)
+    // CONFIRM WITHDRAWAL
     // ===========================
     @Transactional
-    public void confirmWithdraw(Wallet wallet, double points, String txHash) {
-        if (wallet.getLockedBalance() < points) throw new RuntimeException("Insufficient locked balance");
+    public void confirmWithdraw(Wallet wallet, BigDecimal points, String txHash) {
+        if (wallet.getLockedBalance().compareTo(points) < 0) {
+            throw new RuntimeException("Insufficient locked balance");
+        }
 
-        wallet.setLockedBalance(wallet.getLockedBalance() - points);
+        BigDecimal before = wallet.getLockedBalance();
+        wallet.setLockedBalance(before.subtract(points));
         walletRepository.save(wallet);
 
-        // Audit log for completed withdrawal
-        auditLogRepository.save(WalletAuditLog.builder().user(wallet.getUser()).wallet(wallet).action("WITHDRAW_COMPLETE").amount(points).balanceBefore(wallet.getLockedBalance() + points).balanceAfter(wallet.getLockedBalance()).reference(txHash).createdAt(LocalDateTime.now()).build());
+        auditLogRepository.save(
+                WalletAuditLog.builder()
+                        .user(wallet.getUser())
+                        .wallet(wallet)
+                        .action("WITHDRAW_COMPLETE")
+                        .amount(points)
+                        .balanceBefore(before)
+                        .balanceAfter(wallet.getLockedBalance())
+                        .reference(txHash)
+                        .createdAt(LocalDateTime.now())
+                        .build()
+        );
     }
 
     // ===========================
@@ -95,15 +130,23 @@ public class WalletService {
         return walletRepository.findByUser(user);
     }
 
-
+    // ===========================
+    // CREATE WALLET
+    // ===========================
     @Transactional
     public void createWallet(User user, String walletTypeName) {
-        // Find wallet type
-        WalletType type = walletTypeRepository.findByName(walletTypeName).orElseThrow(() -> new RuntimeException("Wallet type not found: " + walletTypeName));
+        WalletType type = walletTypeRepository.findByName(walletTypeName)
+                .orElseThrow(() -> new RuntimeException("Wallet type not found: " + walletTypeName));
 
-        Wallet wallet = Wallet.builder().user(user).walletType(type).balance(0.0).lockedBalance(0.0).createdAt(LocalDateTime.now()).updatedAt(LocalDateTime.now()).build();
+        Wallet wallet = Wallet.builder()
+                .user(user)
+                .walletType(type)
+                .balance(BigDecimal.ZERO)
+                .lockedBalance(BigDecimal.ZERO)
+                .createdAt(LocalDateTime.now())
+                .updatedAt(LocalDateTime.now())
+                .build();
 
         walletRepository.save(wallet);
     }
-
 }

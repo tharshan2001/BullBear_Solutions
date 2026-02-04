@@ -1,7 +1,9 @@
 package bullbear.app.security;
 
+import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.web.method.support.HandlerMethodArgumentResolver;
+import org.springframework.web.reactive.function.client.WebClient;
 import org.springframework.web.servlet.config.annotation.WebMvcConfigurer;
 
 import java.util.List;
@@ -23,4 +25,10 @@ public class WebConfig implements WebMvcConfigurer {
         resolvers.add(userResolver);   // @CurrentUser
         resolvers.add(adminResolver);  // @CurrentAdmin
     }
+
+    @Bean
+    public WebClient.Builder webClientBuilder() {
+        return WebClient.builder();
+    }
+
 }

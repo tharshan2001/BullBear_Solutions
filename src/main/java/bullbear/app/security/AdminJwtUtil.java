@@ -7,6 +7,7 @@ import org.springframework.stereotype.Component;
 
 import java.security.Key;
 import java.util.Date;
+
 @Component
 public class AdminJwtUtil {
 
@@ -21,26 +22,35 @@ public class AdminJwtUtil {
         this.expirationMs = expirationMs;
     }
 
-    // Generate token for admin
-    public String generateToken(String email) { // <-- String email
+    /**
+     * Generate JWT token for admin using username (consistent with UserDetails)
+     */
+    public String generateToken(String username) {
         return Jwts.builder()
-                .setSubject(email)
+                .setSubject(username) // subject is username
                 .setIssuedAt(new Date())
                 .setExpiration(new Date(System.currentTimeMillis() + expirationMs))
                 .signWith(key, SignatureAlgorithm.HS256)
                 .compact();
     }
 
+    /**
+     * Get token expiration in milliseconds
+     */
     public long getExpirationMs() {
         return expirationMs;
     }
 
-    // Extract email from token
+    /**
+     * Extract username from JWT token
+     */
     public String extractUsername(String token) {
         return parseClaims(token).getSubject();
     }
 
-    // Validate token
+    /**
+     * Validate JWT token
+     */
     public boolean validateToken(String token) {
         try {
             parseClaims(token);
@@ -50,6 +60,9 @@ public class AdminJwtUtil {
         }
     }
 
+    /**
+     * Parse claims from token
+     */
     private Claims parseClaims(String token) {
         return Jwts.parserBuilder()
                 .setSigningKey(key)

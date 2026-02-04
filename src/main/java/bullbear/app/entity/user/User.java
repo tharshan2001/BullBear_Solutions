@@ -2,7 +2,6 @@ package bullbear.app.entity.user;
 
 import jakarta.persistence.*;
 import lombok.*;
-import org.jspecify.annotations.NullMarked;
 import org.springframework.security.core.GrantedAuthority;
 import org.springframework.security.core.authority.SimpleGrantedAuthority;
 import org.springframework.security.core.userdetails.UserDetails;
@@ -19,7 +18,6 @@ import java.util.List;
 @NoArgsConstructor
 @AllArgsConstructor
 @Builder
-@NullMarked
 public class User implements UserDetails {
 
     @Id

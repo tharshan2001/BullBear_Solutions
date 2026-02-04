@@ -31,9 +31,9 @@ public class WalletAuditLog {
 
     private String action;
 
-    private Double amount;
-    private Double balanceBefore;
-    private Double balanceAfter;
+    private BigDecimal amount;
+    private BigDecimal balanceBefore;
+    private BigDecimal balanceAfter;
 
     private String reference;
 

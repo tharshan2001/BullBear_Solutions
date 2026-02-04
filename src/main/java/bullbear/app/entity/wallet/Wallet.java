@@ -4,6 +4,7 @@ import bullbear.app.entity.user.User;
 import jakarta.persistence.*;
 import lombok.*;
 
+import java.math.BigDecimal;
 import java.time.LocalDateTime;
 
 @Entity
@@ -19,7 +20,7 @@ public class Wallet {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
-    @ManyToOne(fetch = FetchType.LAZY) // lazy loading for efficiency
+    @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "user_id", nullable = false)
     private User user;
 
@@ -28,10 +29,10 @@ public class Wallet {
     private WalletType walletType;
 
     @Column(nullable = false)
-    private Double balance = 0.0; // default value to prevent null
+    private BigDecimal balance = BigDecimal.ZERO;
 
     @Column(nullable = false)
-    private Double lockedBalance = 0.0; // track locked funds
+    private BigDecimal lockedBalance = BigDecimal.ZERO;
 
     @Column(nullable = false, updatable = false)
     private LocalDateTime createdAt;
