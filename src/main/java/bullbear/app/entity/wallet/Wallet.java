@@ -28,10 +28,12 @@ public class Wallet {
     @JoinColumn(name = "wallet_type_id", nullable = false)
     private WalletType walletType;
 
-    @Column(nullable = false)
+    @Column(nullable = false, precision = 19, scale = 8)
+    @Builder.Default
     private BigDecimal balance = BigDecimal.ZERO;
 
-    @Column(nullable = false)
+    @Column(nullable = false, precision = 19, scale = 8)
+    @Builder.Default
     private BigDecimal lockedBalance = BigDecimal.ZERO;
 
     @Column(nullable = false, updatable = false)

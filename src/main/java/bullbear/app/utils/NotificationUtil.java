@@ -1,7 +1,9 @@
 package bullbear.app.utils;
 
 import bullbear.app.entity.user.Notification;
+import bullbear.app.entity.user.User;
 import bullbear.app.repository.user.NotificationRepository;
+import bullbear.app.repository.user.UserRepository;
 import org.springframework.stereotype.Component;
 
 import java.time.LocalDateTime;
@@ -11,21 +13,19 @@ import java.util.List;
 public class NotificationUtil {
 
     private final NotificationRepository notificationRepository;
+    private final UserRepository userRepository;
 
-    public NotificationUtil(NotificationRepository notificationRepository) {
+    public NotificationUtil(NotificationRepository notificationRepository, UserRepository userRepository) {
         this.notificationRepository = notificationRepository;
+        this.userRepository = userRepository;
     }
 
-    /**
-     * Create and save a notification for a user
-     *
-     * @param userId  target user
-     * @param type    type of notification (e.g., TRANSACTION, SYSTEM)
-     * @param message message content
-     */
     public void notifyUser(Long userId, String type, String message) {
+        User user = userRepository.findById(userId)
+                .orElseThrow(() -> new RuntimeException("User not found"));
+
         Notification notification = new Notification();
-        notification.setUserId(userId);
+        notification.setUser(user);
         notification.setType(type);
         notification.setMessage(message);
         notification.setRead(false);
@@ -34,17 +34,13 @@ public class NotificationUtil {
         notificationRepository.save(notification);
     }
 
-    /**
-     * Optional: Get all notifications for a user
-     */
-    public List<Notification> getUserNotifications(Integer userId) {
-        return notificationRepository.findByUserIdOrderByCreatedAtDesc(userId);
+    public List<Notification> getUserNotifications(Long userId) {
+        User user = userRepository.findById(userId)
+                .orElseThrow(() -> new RuntimeException("User not found"));
+        return notificationRepository.findByUserOrderByCreatedAtDesc(user);
     }
 
-    /**
-     * Optional: Mark a notification as read
-     */
-    public void markAsRead(Integer notificationId) {
+    public void markAsRead(Long notificationId) {
         Notification n = notificationRepository.findById(notificationId)
                 .orElseThrow(() -> new RuntimeException("Notification not found"));
         n.setRead(true);

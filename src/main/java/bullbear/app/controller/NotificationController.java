@@ -28,7 +28,7 @@ public class NotificationController {
         }
 
         return notificationUtil.getUserNotifications(
-                currentUser.getId().intValue()
+                currentUser.getId()
         );
     }
 }

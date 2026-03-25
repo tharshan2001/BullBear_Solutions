@@ -2,32 +2,49 @@ package bullbear.app.entity.user;
 
 import jakarta.persistence.*;
 import lombok.*;
+
 import java.math.BigDecimal;
 import java.time.LocalDateTime;
 
 @Entity
-@Data
+@Table(name = "user_commissions")
+@Getter
+@Setter
 @NoArgsConstructor
 @AllArgsConstructor
-@Table(name = "user_commissions")
+@Builder
 public class UserCommission {
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Integer commissionId;
 
-    @ManyToOne
-    @JoinColumn(name = "user_id")
+    @ManyToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "user_id", nullable = false)
     private User user;
 
-    private String type; // direct, level, etc.
+    @Column(length = 50)
+    private String type;
+
+    @Column(nullable = false, precision = 19, scale = 8)
     private BigDecimal amount;
 
-    @ManyToOne
+    @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "source_user_id")
     private User sourceUser;
 
-    private Integer level; // referral level
-    private String status; // pending, paid, etc.
+    @Column
+    private Integer level;
+
+    @Column(length = 20)
+    @Builder.Default
+    private String status = "PENDING";
+
+    @Column(nullable = false, updatable = false)
     private LocalDateTime createdAt;
+
+    @PrePersist
+    protected void onCreate() {
+        this.createdAt = LocalDateTime.now();
+    }
 }

@@ -14,9 +14,11 @@ public class Notification {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long notificationId;
 
-    private Long userId;
+    @ManyToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "user_id", nullable = false)
+    private User user;
 
-    private String type; // e.g., TRANSACTION, SYSTEM, COMMISSION
+    private String type;
 
     @Column(columnDefinition = "TEXT")
     private String message;
@@ -24,4 +26,9 @@ public class Notification {
     private Boolean read = false;
 
     private LocalDateTime createdAt;
+
+    @PrePersist
+    protected void onCreate() {
+        this.createdAt = LocalDateTime.now();
+    }
 }

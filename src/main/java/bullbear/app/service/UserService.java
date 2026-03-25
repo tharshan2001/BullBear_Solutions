@@ -11,6 +11,7 @@ import org.springframework.stereotype.Service;
 import java.time.LocalDateTime;
 import java.util.Optional;
 import java.util.Random;
+import java.util.UUID;
 
 @Service
 public class UserService {
@@ -29,12 +30,7 @@ public class UserService {
     // Generate unique referral code
     // =========================
     private String generateUniqueCode() {
-        String code;
-        Random random = new Random();
-        do {
-            code = "BB" + (100000 + random.nextInt(900000)); // BB + 6 digits
-        } while (userRepository.findByCode(code).isPresent());
-        return code;
+        return "BB" + System.nanoTime();
     }
 
     // =========================
@@ -63,6 +59,9 @@ public class UserService {
         if (securityPin == null || securityPin.isBlank()) {
             throw new RuntimeException("Security PIN cannot be empty");
         }
+        if (referredByCode == null || referredByCode.isBlank()) {
+            throw new RuntimeException("Referral code is required");
+        }
 
         // 1️⃣ Check if user already exists
         if (userRepository.findByEmail(email).isPresent()) {
@@ -77,12 +76,9 @@ public class UserService {
             throw new RuntimeException("Email not verified via OTP");
         }
 
-        // 3️⃣ Handle referral via code
-        User referringUser = null;
-        if (referredByCode != null && !referredByCode.isBlank()) {
-            referringUser = userRepository.findByCode(referredByCode)
-                    .orElseThrow(() -> new RuntimeException("Invalid referral code"));
-        }
+        // 3️⃣ Handle referral via code - REQUIRED
+        User referringUser = userRepository.findByCode(referredByCode)
+                .orElseThrow(() -> new RuntimeException("Invalid referral code"));
 
         // 4️⃣ Create new user
         User user = new User();
@@ -95,14 +91,17 @@ public class UserService {
         user.setPasswordHash(passwordEncoder.encode(password));
         user.setSecurityPin(passwordEncoder.encode(securityPin));
 
-        // Generate unique referral code
-        user.setCode(generateUniqueCode());
-
         // Set referral relationship
         if (referringUser != null) {
             user.setReferredBy(referringUser);
-            referringUser.getReferences().add(user);
-            userRepository.save(referringUser);
+            referringUser.getReferrals().add(user);
+            
+            int newLevel = Math.min((referringUser.getLevel() != null ? referringUser.getLevel() : 1) + 2, 20);
+            referringUser.setLevel(newLevel);
+            
+            if (referringUser.getReferences() == null) {
+                referringUser.setReferences(new java.util.ArrayList<>());
+            }
         }
 
         // 5️⃣ Activate Premium for 1 year
@@ -111,10 +110,20 @@ public class UserService {
         user.setPremiumActivatedDate(now);
         user.setPremiumExpiryDate(now.plusYears(1));
 
+        // Generate unique code for this user
+        String code = "BB" + System.nanoTime();
+        user.setCode(code);
+
         // 6️⃣ Save new user
         User savedUser = userRepository.save(user);
 
-        // 7️⃣ Delete temp user
+        // 7️⃣ Update referring user's references and level
+        if (referringUser != null) {
+            referringUser.getReferences().add(savedUser.getId());
+            userRepository.save(referringUser);
+        }
+
+        // 8️⃣ Delete temp user
         tempUserRepository.delete(tempUser);
 
         return savedUser;

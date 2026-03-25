@@ -21,38 +21,54 @@ public class Transaction {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long transactionId;
 
-    @ManyToOne
+    @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "user_id", nullable = false)
     private User user;
 
-    @ManyToOne
+    @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "wallet_id", nullable = false)
     private Wallet wallet;
 
-    @Column(nullable = false)
-    private String type; // DEPOSIT, WITHDRAW, TRANSFER, COMMISSION
+    @Column(nullable = false, length = 50)
+    private String type;
 
     @Column(nullable = false, precision = 19, scale = 8)
-    private BigDecimal amount; // changed from Double to BigDecimal
+    private BigDecimal amount;
 
+    @Column(length = 10)
     private String currency;
+
+    @Column(length = 50)
     private String network;
+
+    @Column(length = 100)
     private String txHash;
 
+    @Column(nullable = false, length = 20)
+    private String status;
+
     @Column(nullable = false)
-    private String status; // PENDING, SUCCESS, FAILED
+    @Builder.Default
+    private boolean adminApproved = false;
 
-    private boolean adminApproved;
-
-    @ManyToOne
+    @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "admin_approved_by")
     private Admin adminApprovedBy;
 
     @Column(nullable = false, updatable = false)
     private LocalDateTime createdAt;
 
+    @Column
+    private LocalDateTime updatedAt;
+
     @PrePersist
     protected void onCreate() {
         this.createdAt = LocalDateTime.now();
+        this.updatedAt = this.createdAt;
+    }
+
+    @PreUpdate
+    protected void onUpdate() {
+        this.updatedAt = LocalDateTime.now();
     }
 }
